@@ -22,9 +22,10 @@ Each rule should be stored as a separate XML file using a descriptive name based
 Example:
 
 ```text
-rules/AI-Agent-Reading-Credential-Files.xml
-rules/MCP-Configuration-Created-or-Modified.xml
-rules/Local-LLM-Exposed-to-Network.xml
+rules/AI-Agent-Reading-Credential-Files[XX1234]
+rules/MCP-Configuration-Created-or-Modified[XX1234]
+rules/Local-LLM-Exposed-to-Network[XX1234abc]
+the XX stands for author initials, abc is the rule sub-version
 ```
 
 Rules can be browsed directly in the `rules/` directory by filename; the README does not need to be updated for every new rule.

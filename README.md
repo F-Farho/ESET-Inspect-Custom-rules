@@ -50,7 +50,7 @@ Rules should be considered starting points rather than universally production-re
 
 ## Submitting a Custom Rule
 
-If you have a custom rule you would like to share the community with, use the provided [`rules/template.xml`](rules/template.xml) as the starting format and replace the placeholder values with the rule-specific metadata and detection logic.
+If you have a custom rule you would like to share the community with, use the provided [`Template.xml`](Template.xml) as the starting format and replace the placeholder values with the rule-specific metadata and detection logic.
 
 ## Contributions
 

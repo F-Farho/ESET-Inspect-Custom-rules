@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+    <description>
+        <name>AI Agent or MCP Runtime Spawns LOLBin [FF2027d]</name>
+        <category>Suspicious Process Creation and Process Manipulation</category>
+        <os>Windows</os>
+        <severity>60</severity>
+        <mitreattackid>T1218,T1059</mitreattackid>
+        <explanation>Detects an AI agent or MCP-related runtime creating a Windows living-off-the-land binary commonly abused for proxy execution, script execution, downloading, or indirect code execution. Generic Node.js, Python, and uvx processes are restricted to command lines containing MCP to reduce unrelated development activity.</explanation>
+        <benignCauses>Authorized AI automation, build workflows, developer tooling, or MCP integrations may intentionally invoke one of these utilities. MSBuild usage may be more common in development environments.</benignCauses>
+        <maliciousCauses>A malicious or compromised AI agent or MCP server may invoke trusted Windows utilities to execute attacker-controlled content, download files, or bypass application controls.</maliciousCauses>
+        <recommendedActions>1. Review the child process command line and determine what file, URL, script, DLL, or project was supplied.
+2. Review the AI agent or MCP runtime process and its complete process lineage.
+3. Determine which MCP server, AI workflow, extension, or user action initiated the process.
+4. Review file and network events associated with the spawned utility.
+5. If the execution was unauthorized, contain the affected endpoint and investigate the originating AI or MCP component.</recommendedActions>
+    </description>
+    <definition>
+        <process>
+            <operator type="OR">
+                <condition component="FileItem" property="FileName" condition="is" value="claude.exe" />
+                <condition component="FileItem" property="FileName" condition="is" value="cursor.exe" />
+                <condition component="FileItem" property="FileName" condition="is" value="windsurf.exe" />
+                <operator type="AND">
+                    <condition component="FileItem" property="FileName" condition="is" value="node.exe" />
+                    <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp" />
+                </operator>
+                <operator type="AND">
+                    <condition component="FileItem" property="FileName" condition="is" value="python.exe" />
+                    <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp" />
+                </operator>
+                <operator type="AND">
+                    <condition component="FileItem" property="FileName" condition="is" value="uvx.exe" />
+                    <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp" />
+                </operator>
+            </operator>
+        </process>
+        <operations>
+            <operation type="CreateProcess">
+                <operator type="OR">
+                    <condition component="FileItem" property="FileName" condition="is" value="mshta.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="mshta.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="regsvr32.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="regsvr32.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="rundll32.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="rundll32.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="certutil.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="certutil.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="bitsadmin.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="bitsadmin.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="wscript.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="wscript.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="cscript.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="cscript.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="installutil.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="installutil.exe" />
+                    <condition component="FileItem" property="FileName" condition="is" value="msbuild.exe" />
+                    <condition component="Module" property="OriginalFileName" condition="is" value="msbuild.exe" />
+                </operator>
+            </operation>
+        </operations>
+    </definition>
+    <maliciousTarget name="current" />
+    <actions>
+        <action name="TriggerDetection" />
+        <action name="StoreEvent" />
+    </actions>
+</rule>

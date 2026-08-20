@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+    <description>
+        <name>RULE_NAME [RULE_ID]</name>
+        <category>Discovery</category>
+        <os>Windows</os>
+        <severity>50</severity>
+        <mitreattackid>MITRE_TECHNIQUE_ID</mitreattackid>
+        <explanation>Describe what the rule detects.</explanation>
+        <maliciousCauses>Describe malicious activity that could cause this detection.</maliciousCauses>
+        <benignCauses>Describe legitimate activity that could cause this detection.</benignCauses>
+        <recommendedActions>1. Review the triggering event. 2. Review the process tree and related activity. 3. Confirm whether the behavior was authorized. 4. Take appropriate response actions if malicious activity is confirmed.</recommendedActions>
+    </description>
+
+    <definition>
+        <process>
+            <!-- Replace this example condition with the process logic required by the rule. -->
+            <condition
+                component="FileItem"
+                property="FileNameWithoutExtension"
+                condition="is"
+                value="PROCESS_NAME" />
+        </process>
+
+        <!--
+        Add operation-based logic when required. Example:
+
+        <operations>
+            <operation type="ReadFile">
+                <condition
+                    component="FileItem"
+                    property="FileName"
+                    condition="is"
+                    value="TARGET_FILE" />
+            </operation>
+        </operations>
+        -->
+    </definition>
+
+    <maliciousTarget name="current" />
+
+    <actions>
+        <action name="TriggerDetection" />
+        <action name="StoreEvent" />
+    </actions>
+</rule>

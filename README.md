@@ -27,16 +27,17 @@ rules/MCP-Configuration-Created-or-Modified.xml
 rules/Local-LLM-Exposed-to-Network.xml
 ```
 
-The README index should remain sorted alphabetically by rule name.
+Rules can be browsed directly in the `rules/` directory by filename; the README does not need to be updated for every new rule.
 
 ## Rule Information
 
-Where applicable, each rule entry should include:
+Where applicable, each rule should include:
 
 - Rule name
 - Short detection description
 - MITRE ATT&CK technique or sub-technique
-- Link to the XML rule file
+- Detection logic
+- Recommended analyst actions
 
 Additional context, tuning notes, known false positives, or testing information can be documented alongside the rule when useful.
 
@@ -45,6 +46,10 @@ Additional context, tuning notes, known false positives, or testing information 
 Review the XML before importing it into ESET Inspect. Detection logic should be validated against the ESET Inspect version and telemetry available in the target environment.
 
 Rules should be considered starting points rather than universally production-ready detections.
+
+## Submitting a Custom Rule
+
+To submit a custom rule, use the provided [`rules/template.xml`](rules/template.xml) as the starting format and replace the placeholder values with the rule-specific metadata and detection logic.
 
 ## Contributions
 

@@ -14,24 +14,6 @@ The goal of this repository is to keep custom rules organized, searchable by rul
 >
 > **Always review and test rules in a controlled environment before deploying them to production.**
 
-## Rule Index
-
-Rules are listed alphabetically by **rule name**.
-
-| Rule Name | Description | MITRE ATT&CK | Rule File |
-|---|---|---|---|
-| _No rules added yet_ | — | — | — |
-
-## Repository Structure
-
-```text
-ESET-Inspect-Custom-rules/
-├── README.md
-└── rules/
-    └── <Rule-Name>.xml
-```
-
-The `rules/` directory will be created when the first rule is added.
 
 ## Rule Naming
 

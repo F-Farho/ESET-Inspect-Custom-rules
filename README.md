@@ -50,9 +50,7 @@ Rules should be considered starting points rather than universally production-re
 
 ## Submitting a Custom Rule
 
-If you have a custom rule you would like to share with the community, use the provided [`Template.xml`](Template.xml) as the starting format and submit it through the **Custom Rule Submission** form under the repository's **Issues** tab.
-
-Submissions are reviewed before any rule is added to the repository. Contributors do not need repository write access.
+If you have a custom rule you would like to share the community with, use the provided [`Template.xml`](Template.xml) as the starting format and replace the placeholder values with the rule-specific metadata and detection logic.
 
 ## Contributions
 

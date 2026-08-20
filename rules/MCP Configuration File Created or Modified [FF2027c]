@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+    <description>
+        <name>MCP Configuration File Created or Modified [FF2027c]</name>
+        <category>File System</category>
+        <os>Windows</os>
+        <severity>30</severity>
+        <explanation>Detects writing or rename-based replacement of configuration filenames commonly associated with Model Context Protocol integrations. Both WriteFile and RenameFile are monitored because applications may update configuration by writing a temporary file and renaming it over the destination.</explanation>
+        <benignCauses>Developers, administrators, AI applications, IDE extensions, deployment tools, and configuration-management software may legitimately create or modify MCP configuration.</benignCauses>
+        <maliciousCauses>An adversary or malicious software may modify MCP configuration to register an unauthorized MCP server or cause an AI application to launch attacker-controlled commands.</maliciousCauses>
+        <recommendedActions>1. Review the process that wrote or renamed the MCP configuration file.
+2. Review the full destination path and determine which AI application or development environment owns the configuration.
+3. Inspect the configuration for newly introduced commands, executable paths, arguments, remote endpoints, or MCP server definitions.
+4. Review subsequent processes created by the associated AI application.
+5. If the change was unauthorized, remove the configuration change and investigate the writer process and its lineage.</recommendedActions>
+    </description>
+    <definition>
+        <operations>
+            <operation type="WriteFile">
+                <operator type="OR">
+                    <condition component="FileItem" property="FileName" condition="is" value="claude_desktop_config.json" />
+                    <condition component="FileItem" property="FileName" condition="is" value="mcp.json" />
+                    <condition component="FileItem" property="FileName" condition="is" value="mcp_config.json" />
+                    <condition component="FileItem" property="FileName" condition="is" value="mcp-config.json" />
+                    <condition component="FileItem" property="FileName" condition="is" value="cline_mcp_settings.json" />
+                    <condition component="FileItem" property="FileName" condition="is" value="mcp_settings.json" />
+                </operator>
+            </operation>
+            <operation type="RenameFile">
+                <operator type="OR">
+                    <condition component="DestFileItem" property="FileName" condition="is" value="claude_desktop_config.json" />
+                    <condition component="DestFileItem" property="FileName" condition="is" value="mcp.json" />
+                    <condition component="DestFileItem" property="FileName" condition="is" value="mcp_config.json" />
+                    <condition component="DestFileItem" property="FileName" condition="is" value="mcp-config.json" />
+                    <condition component="DestFileItem" property="FileName" condition="is" value="cline_mcp_settings.json" />
+                    <condition component="DestFileItem" property="FileName" condition="is" value="mcp_settings.json" />
+                </operator>
+            </operation>
+        </operations>
+    </definition>
+    <maliciousTarget name="current" />
+    <actions>
+        <action name="TriggerDetection" />
+        <action name="StoreEvent" />
+    </actions>
+</rule>

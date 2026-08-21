@@ -1,68 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rule>
-    <description>
-        <name>AI Agent or MCP Runtime Spawns LOLBin [FF2027d]</name>
-        <category>Suspicious Process Creation and Process Manipulation</category>
-        <os>Windows</os>
-        <severity>60</severity>
-        <mitreattackid>T1218,T1059</mitreattackid>
-        <explanation>Detects an AI agent or MCP-related runtime creating a Windows living-off-the-land binary commonly abused for proxy execution, script execution, downloading, or indirect code execution. Generic Node.js, Python, and uvx processes are restricted to command lines containing MCP to reduce unrelated development activity.</explanation>
-        <benignCauses>Authorized AI automation, build workflows, developer tooling, or MCP integrations may intentionally invoke one of these utilities. MSBuild usage may be more common in development environments.</benignCauses>
-        <maliciousCauses>A malicious or compromised AI agent or MCP server may invoke trusted Windows utilities to execute attacker-controlled content, download files, or bypass application controls.</maliciousCauses>
-        <recommendedActions>1. Review the child process command line and determine what file, URL, script, DLL, or project was supplied.
-2. Review the AI agent or MCP runtime process and its complete process lineage.
-3. Determine which MCP server, AI workflow, extension, or user action initiated the process.
-4. Review file and network events associated with the spawned utility.
-5. If the execution was unauthorized, contain the affected endpoint and investigate the originating AI or MCP component.</recommendedActions>
-    </description>
-    <definition>
-        <process>
-            <operator type="OR">
-                <condition component="FileItem" property="FileName" condition="is" value="claude.exe" />
-                <condition component="FileItem" property="FileName" condition="is" value="cursor.exe" />
-                <condition component="FileItem" property="FileName" condition="is" value="windsurf.exe" />
-                <operator type="AND">
-                    <condition component="FileItem" property="FileName" condition="is" value="node.exe" />
-                    <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp" />
-                </operator>
-                <operator type="AND">
-                    <condition component="FileItem" property="FileName" condition="is" value="python.exe" />
-                    <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp" />
-                </operator>
-                <operator type="AND">
-                    <condition component="FileItem" property="FileName" condition="is" value="uvx.exe" />
-                    <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp" />
-                </operator>
-            </operator>
-        </process>
-        <operations>
-            <operation type="CreateProcess">
-                <operator type="OR">
-                    <condition component="FileItem" property="FileName" condition="is" value="mshta.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="mshta.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="regsvr32.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="regsvr32.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="rundll32.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="rundll32.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="certutil.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="certutil.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="bitsadmin.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="bitsadmin.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="wscript.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="wscript.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="cscript.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="cscript.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="installutil.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="installutil.exe" />
-                    <condition component="FileItem" property="FileName" condition="is" value="msbuild.exe" />
-                    <condition component="Module" property="OriginalFileName" condition="is" value="msbuild.exe" />
-                </operator>
-            </operation>
-        </operations>
-    </definition>
-    <maliciousTarget name="current" />
-    <actions>
-        <action name="TriggerDetection" />
-        <action name="StoreEvent" />
-    </actions>
+  <description>
+    <name>AI Agent or MCP Runtime Spawns LOLBin [FF2027d]</name>
+    <category>Suspicious Process Creation and Process Manipulation</category>
+    <os>Windows</os>
+    <severity>60</severity>
+    <mitreattackid>T1218,T1197,T1140</mitreattackid>
+    <explanation>Detects suspicious use of high-risk Windows living-off-the-land binaries from a process tree associated with an AI agent, AI-enabled development environment, agent framework, or MCP runtime. Frequently legitimate LOLBin functions are filtered using simple command-line conditions.</explanation>
+    <maliciousCauses>A compromised AI agent, malicious MCP server, malicious extension, or prompt-driven tool invocation may abuse trusted Windows utilities for proxy execution, downloading, decoding, registration, or execution of attacker-controlled content.</maliciousCauses>
+    <benignCauses>AI applications may legitimately open authentication URLs, install software, manage certificates, or invoke development tooling. Common browser URL handling by rundll32 and normal uses of other dual-use utilities are filtered where practical.</benignCauses>
+    <recommendedActions>1. Review the triggering process command line.
+2. Review the process tree and identify the originating AI agent, extension, MCP server, or framework.
+3. Determine what file, URL, DLL, script, or package was supplied to the LOLBin.
+4. Review related file, network, registry, and script activity.
+5. Determine whether execution originated from an authorized AI workflow.
+6. Initiate incident response procedures if the activity is unauthorized.</recommendedActions>
+  </description>
+  <definition>
+    <ancestor unique="true">
+      <operator type="OR">
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="claude" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="cursor" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="windsurf" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="kiro" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="goose" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="aider" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="codex" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="gemini" />
+        <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="opencode" />
+        <operator type="AND">
+          <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="node" />
+          <operator type="OR">
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="@anthropic-ai/claude-code" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="@openai/codex" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="@google/gemini-cli" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="@modelcontextprotocol/" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp-server" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp_server" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="saoudrizwan.claude-dev" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="continue.continue" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="rooveterinaryinc.roo-cline" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="github.copilot" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="codeium.codeium" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="sourcegraph.cody-ai" />
+          </operator>
+        </operator>
+        <operator type="AND">
+          <operator type="OR">
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="python" />
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="pythonw" />
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="uv" />
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="uvx" />
+          </operator>
+          <operator type="OR">
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="aider" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="crewai" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="autogen" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="open-interpreter" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="openhands" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="fastmcp" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp-server" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="mcp_server" />
+          </operator>
+        </operator>
+      </operator>
+    </ancestor>
+    <process>
+      <operator type="OR">
+        <operator type="OR">
+                    <!-- MSHTA is uncommon in normal AI-assisted workflows -->
+          <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="mshta" />
+          <condition component="Module" property="OriginalFileName" condition="is" value="mshta.exe" />
+        </operator>
+        <operator type="OR">
+                    <!-- CMSTP proxy execution -->
+          <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="cmstp" />
+          <condition component="Module" property="OriginalFileName" condition="is" value="cmstp.exe" />
+        </operator>
+        <operator type="AND">
+          <operator type="OR">
+                        <!--Rundll32 is commonly used by applications to launch the default browser.
+          HTTP and HTTPS URL handling through url.dll or ShellExec_RunDLL is excluded.
+          file:, javascript:, local DLL execution, unusual exports and other forms remain detected.
+-->
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="rundll32" />
+            <condition component="Module" property="OriginalFileName" condition="is" value="rundll32.exe" />
+          </operator>
+          <condition component="ProcessInfo" property="CommandLine" condition="notcontains" value="OpenURL" />
+          <condition component="ProcessInfo" property="CommandLine" condition="notcontains" value="FileProtocolHandler" />
+          <condition component="ProcessInfo" property="CommandLine" condition="notcontains" value="ShellExec_RunDLL" />
+        </operator>
+        <operator type="AND">
+          <operator type="OR">
+                      <!-- Regsvr32 restricted to remote or scriptlet-style execution -->
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="regsvr32" />
+            <condition component="Module" property="OriginalFileName" condition="is" value="regsvr32.exe" />
+          </operator>
+          <operator type="OR">
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="scrobj.dll" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="http://" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="https://" />
+          </operator>
+        </operator>
+        <operator type="AND">
+          <operator type="OR">
+                      <!-- Certutil restricted to download or encode/decode behavior -->
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="certutil" />
+            <condition component="Module" property="OriginalFileName" condition="is" value="certutil.exe" />
+          </operator>
+          <operator type="OR">
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="-urlcache" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="/urlcache" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="-verifyctl" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="/verifyctl" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="-decode" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="/decode" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="-encode" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="/encode" />
+          </operator>
+        </operator>
+        <operator type="AND">
+          <operator type="OR">
+                      <!-- BITSAdmin restricted to transfer activity -->
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="bitsadmin" />
+            <condition component="Module" property="OriginalFileName" condition="is" value="bitsadmin.exe" />
+          </operator>
+          <operator type="OR">
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="/transfer" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="/addfile" />
+          </operator>
+        </operator>
+        <operator type="AND">
+          <operator type="OR">
+                      <!-- MSIExec restricted to remote package execution -->
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="msiexec" />
+            <condition component="Module" property="OriginalFileName" condition="is" value="msiexec.exe" />
+          </operator>
+          <operator type="OR">
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="http://" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="https://" />
+          </operator>
+        </operator>
+      </operator>
+    </process>
+  </definition>
+  <maliciousTarget name="current" />
+  <actions>
+    <action name="TriggerDetection" />
+    <action name="StoreEvent" />
+  </actions>
 </rule>

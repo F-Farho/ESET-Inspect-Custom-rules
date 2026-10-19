@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+  <description>
+    <name>CodexSandboxOffline External Network Connection</name>
+    <category>Communication</category>
+    <os>Windows</os>
+    <severity>90</severity>
+    <explanation>Detects an outbound TCP connection to a non-local network address from a process running under the CodexSandboxOffline account. This account is expected to operate without external network access.</explanation>
+    <maliciousCauses>An adversary may have modified the sandbox restrictions, abused the sandbox identity, or escaped the intended offline execution boundary.</maliciousCauses>
+    <benignCauses>An authorized product or security configuration change that intentionally permits network access for CodexSandboxOffline.</benignCauses>
+    <recommendedActions>1. Review the triggering process, process tree and command line.
+2. Review the destination IP address and hostname.
+3. Verify the current group membership, ACLs and network restrictions applied to CodexSandboxOffline.
+4. Check other detections on the endpoint for privilege escalation, account manipulation or sandbox tampering.
+5. If the connection is unauthorized, contain the endpoint and initiate the incident response process.</recommendedActions>
+  </description>
+  <definition>
+    <process>
+      <operator type="OR">
+        <condition component="ProcessInfo" property="ProcessOwner" condition="is" value="CodexSandboxOffline" />
+        <condition component="ProcessInfo" property="ProcessOwner" condition="ends" value="\CodexSandboxOffline" />
+      </operator>
+    </process>
+    <operations>
+      <operation type="TcpIpConnect">
+        <operator type="OR">
+          <operator type="NOT">
+            <operator type="OR">
+              <condition component="Network" property="IpAddressV4" condition="is" value="10.0.0.0/8" />
+              <condition component="Network" property="IpAddressV4" condition="is" value="172.16.0.0/12" />
+              <condition component="Network" property="IpAddressV4" condition="is" value="192.168.0.0/16" />
+              <condition component="Network" property="IpAddressV4" condition="is" value="127.0.0.0/8" />
+            </operator>
+          </operator>
+          <operator type="NOT">
+            <operator type="OR">
+              <condition component="Network" property="IpAddressV6" condition="is" value="fc00::/7" />
+              <condition component="Network" property="IpAddressV6" condition="is" value="fe80::/10" />
+              <condition component="Network" property="IpAddressV6" condition="is" value="::1/128" />
+            </operator>
+          </operator>
+        </operator>
+      </operation>
+    </operations>
+  </definition>
+  <maliciousTarget name="current" />
+  <actions>
+    <action name="TriggerDetection" />
+    <action name="StoreEvent" />
+  </actions>
+</rule>

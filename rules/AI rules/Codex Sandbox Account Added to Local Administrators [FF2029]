@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+  <description>
+    <name>Codex Sandbox Account Added to Local Administrators</name>
+    <category>Privilege Escalation</category>
+    <os>Windows</os>
+    <severity>90</severity>
+    <mitreattackid>T1098</mitreattackid>
+    <explanation>Detects either Codex sandbox account being added to the local Administrators group.</explanation>
+    <maliciousCauses>An adversary or unauthorized administrator may add a restricted Codex sandbox identity to the local Administrators group to bypass the intended sandbox privilege boundary.</maliciousCauses>
+    <benignCauses>Authorized troubleshooting or a deliberate change to the Codex sandbox security model.</benignCauses>
+    <recommendedActions>1. Identify the user that performed the group membership change.
+2. Verify whether the change was explicitly authorized.
+3. Review recent activity performed by the affected Codex sandbox account.
+4. Check other detections on the endpoint.
+5. If unauthorized, remove the account from the Administrators group and initiate the incident response process.</recommendedActions>
+  </description>
+  <definition>
+    <operations>
+      <operation type="UserAddToGroup">
+        <operator type="AND">
+          <operator type="OR">
+            <condition component="TargetUser" property="UserName" condition="is" value="CodexSandboxOffline" />
+            <condition component="TargetUser" property="UserName" condition="is" value="CodexSandboxOnline" />
+          </operator>
+          <condition component="UserGroupData" property="Sid" condition="is" value="S-1-5-32-544" />
+        </operator>
+      </operation>
+    </operations>
+  </definition>
+  <maliciousTarget name="none" />
+  <actions>
+    <action name="TriggerDetection" />
+    <action name="StoreEvent" />
+    <action name="ReportIncident" aggregateOn="Computers" />
+  </actions>
+</rule>

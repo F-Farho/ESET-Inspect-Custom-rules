@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rule>
   <description>
-    <name>CodexSandboxOffline External Network Connection</name>
+    <name>CodexSandboxOffline External Network Connection[FF2029c]</name>
     <category>Communication</category>
     <os>Windows</os>
     <severity>90</severity>

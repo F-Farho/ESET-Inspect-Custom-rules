@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rule>
-  <!-- No directly similar account-group manipulation rule exists; this structure uses native UserAddToGroup telemetry. -->
-  <!-- Deploy to a test target group before production. -->
   <description>
-    <name>Unexpected Account Added to CodexSandboxUsers</name>
+    <name>Unexpected Account Added to CodexSandboxUsers [FF2029b]</name>
     <category>Persistence</category>
     <os>Windows</os>
     <severity>75</severity>
@@ -36,6 +34,5 @@
   <actions>
     <action name="TriggerDetection" />
     <action name="StoreEvent" />
-    <action name="ReportIncident" aggregateOn="Computers" />
   </actions>
 </rule>

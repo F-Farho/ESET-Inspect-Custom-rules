@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+  <!-- No directly similar account-group manipulation rule exists; this structure uses native UserAddToGroup telemetry. -->
+  <!-- Deploy to a test target group before production. -->
+  <description>
+    <name>Unexpected Account Added to CodexSandboxUsers</name>
+    <category>Persistence</category>
+    <os>Windows</os>
+    <severity>75</severity>
+    <mitreattackid>T1098</mitreattackid>
+    <explanation>Detects an account other than the two expected Codex sandbox identities being added to the CodexSandboxUsers group.</explanation>
+    <maliciousCauses>An adversary or unauthorized administrator may manipulate membership of the Codex sandbox group to gain access to resources or security settings associated with the sandbox configuration.</maliciousCauses>
+    <benignCauses>An authorized change to the Codex sandbox design that intentionally introduces another account.</benignCauses>
+    <recommendedActions>1. Identify the account that was added and the user that performed the change.
+2. Verify whether the membership change was explicitly authorized.
+3. Review the permissions and restrictions assigned to CodexSandboxUsers.
+4. Check recent activity of the newly added account and other detections on the endpoint.
+5. If unauthorized, remove the unexpected membership and initiate the incident response process.</recommendedActions>
+  </description>
+  <definition>
+    <operations>
+      <operation type="UserAddToGroup">
+        <operator type="AND">
+          <condition component="UserGroupData" property="UserName" condition="is" value="CodexSandboxUsers" />
+          <operator type="NOT">
+            <operator type="OR">
+              <condition component="TargetUser" property="UserName" condition="is" value="CodexSandboxOffline" />
+              <condition component="TargetUser" property="UserName" condition="is" value="CodexSandboxOnline" />
+            </operator>
+          </operator>
+        </operator>
+      </operation>
+    </operations>
+  </definition>
+  <maliciousTarget name="none" />
+  <actions>
+    <action name="TriggerDetection" />
+    <action name="StoreEvent" />
+    <action name="ReportIncident" aggregateOn="Computers" />
+  </actions>
+</rule>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rule>
   <description>
-    <name>Codex Sandbox Account Added to Local Administrators</name>
+    <name>Codex Sandbox Account Added to Local Administrators [FF2029a]</name>
     <category>Privilege Escalation</category>
     <os>Windows</os>
     <severity>90</severity>
@@ -32,6 +32,5 @@
   <actions>
     <action name="TriggerDetection" />
     <action name="StoreEvent" />
-    <action name="ReportIncident" aggregateOn="Computers" />
   </actions>
 </rule>

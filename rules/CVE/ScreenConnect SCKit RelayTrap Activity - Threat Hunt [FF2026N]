@@ -64,7 +64,7 @@
   </definition>
   <maliciousTarget name="current" />
   <actions>
-    <action name="StoreEvent" />
+    <!--action name="StoreEvent" /-->
     <action name="TriggerDetection" />
   </actions>
 </rule>

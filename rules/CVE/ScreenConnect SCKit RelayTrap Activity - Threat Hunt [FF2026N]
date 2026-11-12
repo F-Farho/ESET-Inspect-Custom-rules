@@ -1,0 +1,70 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+  <description>
+    <name>ScreenConnect SCKit RelayTrap Activity - Threat Hunt [FF2026N]</name>
+    <category>Remote Desktop / Remote Access</category>
+    <os>Windows</os>
+    <severity>85</severity>
+    <mitreattackid>T1219,T1059.001,T1053.005,T1547.001</mitreattackid>
+    <explanation>Detects known SCKit/RelayTrap staging, execution, persistence, and command infrastructure related to rogue ScreenConnect deployments.</explanation>
+    <benignCauses>Authorized security tests or rare coincidental artifact names.</benignCauses>
+    <maliciousCauses>Attacker-controlled ScreenConnect deployment, SCKit execution, or persistence.</maliciousCauses>
+    <recommendedActions>1. Investigate ScreenConnect instance IDs and command ancestry. 
+2. Check new services, the TrapWatch scheduled task, RelayTrap directory, and panel Run Command history. 
+3. Avoid interactive ScreenConnect sessions to suspected affected hosts; use an out-of-band response method.</recommendedActions>
+  </description>
+  <definition>
+    <operations>
+      <operation type="CreateProcess">
+        <operator type="OR">
+          <condition component="ProcessInfo" property="CommandLine" condition="contains" value="sckit-" />
+          <condition component="ProcessInfo" property="CommandLine" condition="contains" value="\ProgramData\RelayTrap\" />
+          <condition component="ProcessInfo" property="CommandLine" condition="contains" value="Panel-Lateral.ps1" />
+          <condition component="ProcessInfo" property="CommandLine" condition="contains" value="Run-Lateral-Full.bat" />
+          <condition component="ProcessInfo" property="CommandLine" condition="contains" value="ToolboxRelayUploader.exe" />
+          <condition component="ProcessInfo" property="CommandLine" condition="contains" value="TrapWatch.ps1" />
+          <operator type="AND">
+            <condition component="FileItem" property="FileNameWithoutExtension" condition="is" value="msiexec" />
+            <condition component="ProcessInfo" property="CommandLine" condition="contains" value="\Windows\Temp\sc.msi" />
+          </operator>
+          <operator type="AND">
+            <condition component="FileItem" property="FileName" condition="is" value="RelayTrap.exe" />
+            <condition component="FileItem" property="FullPath" condition="contains" value="\ProgramData\RelayTrap\trapbins\" />
+          </operator>
+        </operator>
+      </operation>
+      <operation type="WriteFile">
+        <operator type="OR">
+          <condition component="FileItem" property="FullPath" condition="contains" value="\ProgramData\RelayTrap\" />
+          <condition component="FileItem" property="FileName" condition="is" value="sckit-run.bat" />
+          <condition component="FileItem" property="FileName" condition="is" value="sckit-decoder.ps1" />
+          <condition component="FileItem" property="FileName" condition="is" value="sckit-loader.ps1" />
+          <condition component="FileItem" property="FileName" condition="is" value="Run-Lateral-Full.bat" />
+          <condition component="FileItem" property="FileName" condition="is" value="Panel-Lateral.ps1" />
+          <condition component="FileItem" property="FileName" condition="is" value="ToolboxRelayUploader.exe" />
+        </operator>
+      </operation>
+      <operation type="ScheduledTaskAdded">
+        <condition component="ScheduledTask" property="Name" condition="is" value="TrapWatch" />
+      </operation>
+      <operation type="RegSetValue">
+        <condition component="RegistryItem" property="Key" condition="is" value="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\RelayTrapLiteAlert" />
+      </operation>
+      <operation type="DnsRequest">
+        <operator type="OR">
+          <condition component="DnsInfo" property="DnsQuery" condition="is" value="ns.mo7sen.dev" />
+          <condition component="DnsInfo" property="DnsQuery" condition="is" value="sc.payproofkit.com" />
+          <condition component="DnsInfo" property="DnsQuery" condition="is" value="cdn007-digitaldownloads.com" />
+          <condition component="DnsInfo" property="DnsQuery" condition="is" value="newnewnew.gotdns.org" />
+          <condition component="DnsInfo" property="DnsQuery" condition="is" value="soxnewwork.homedns.org" />
+        </operator>
+      </operation>
+    </operations>
+  </definition>
+  <maliciousTarget name="current" />
+  <actions>
+    <action name="StoreEvent" />
+    <action name="TriggerDetection" />
+  </actions>
+</rule>
